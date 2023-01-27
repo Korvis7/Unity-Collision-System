@@ -1,0 +1,18 @@
+The way this system works is to centralize collision processing into a collision manager that contains all the information about both objects involved in the collision and the logic to carry out the intended consequences of each collision on each Update() frame. 
+
+https://docs.unity3d.com/Manual/ExecutionOrder.html
+
+OnTriggerEnter & OnCollisionEnter always fire before Update(). I am going to collect all of these into a list of collisions in a CollisionManager script & empty object. I organized information about the collision by a custom CollisionClass that includes the game objects and tags of both objects involved in the collision.
+
+1.	The Collision Manager singleton is attached as script to a CollisionManager empty in the scene.
+2.	The Collider Script is attached to all game objects that will be part of collisions
+3.	How it works:
+a.	First the CollisionManager creates itself as a singleton via Unity’s Awake() function with the CollisionManager empty scene object awakening at the beginning of the scene.
+b.	When an object with the ColliderScript collides with another object that either has a trigger or a collider it is going to create a new CollisionClass. This CollisionClass stores both the gameObjects & tags of the two objects involved in the collision/trigger as well as distinguishing which one is which. 
+c.	The ColliderScript will then send the CollisionClassinstance to the CollisionManager to be added to a list.
+d.	On every Update() call, we foreach loop through the list of collisions accumulated and call the ProcessCollision() method on each of them. We then Clear(); the list.
+e.	ProcessCollision() fetches all of the information from the collision via getter methods from the CollisionClass.
+i.	We then use simple stringly typed nested if logic to determine game logic for any collisions we want to process. 
+
+
+New collision logic is therefore added via (firstly creating objects and assigning them with colliders, rigidbodies, & toggling ‘Is Trigger’ as needed but then also) naming objects,  assigning tags to said objects, and then updating the logic inside the ProcessCollision(); method inside the CollisionManager.cs script attached to the CollisionManager empty object in the scene.
